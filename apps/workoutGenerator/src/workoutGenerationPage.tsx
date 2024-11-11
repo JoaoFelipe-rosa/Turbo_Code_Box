@@ -8,7 +8,7 @@ export default function WorkoutGenerationPage() {
                 <div className="flex w-96 items-center ">
                     <div className=" text-center w-full m-10 border rounded bg-[#386180]">
                         <WorkoutCards />
-                        <WorkoutCadastration />
+                        {/* <WorkoutCadastration /> */}
                     </div>
                 </div>
             </div>

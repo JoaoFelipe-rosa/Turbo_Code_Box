@@ -1,0 +1,7 @@
+
+{
+  "watch": ["src/pages/api"],
+  "ext": "ts",
+  "exec": "ts-node ./src/pages/api/index.ts"
+}
+  

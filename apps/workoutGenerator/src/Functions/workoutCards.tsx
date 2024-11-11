@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import axios from "axios";
@@ -34,7 +35,7 @@ interface DaysOfWeek {
 }
 
 export default function WorkoutCards() {
-    const apiUrl = "http://localhost:5000/exercise/";
+    const apiUrl = "http://localhost:8080/exercise";
     const [loading, setLoading] = useLoading(false);
     const [Workout, setWorkout] = useState<WorkoutItem[]>([]);
     const [selectedDay, setSelectedDay] = useState<string>("Segunda");
@@ -53,7 +54,7 @@ export default function WorkoutCards() {
         return exercicios.filter(exercicio => exercicio.type === tipoDesejado);
     }
 
-    function getWorkout() {
+    async function getWorkout() {
         setLoading(true);
         axios
             .get(apiUrl)
@@ -87,7 +88,7 @@ export default function WorkoutCards() {
 
     useEffect(() => {
         getWorkout();
-    }, [selectedDay]);
+    }, []);
 
     console.log(daysOfWeek);
     return (
@@ -110,7 +111,17 @@ export default function WorkoutCards() {
                 ) : (
                     <>
                         {!filteredWorkout || filteredWorkout.length === 0 ? (
-                            <h1>sem treino</h1>
+                            <>
+                                <h1>sem treino</h1>
+                                <button
+                                    onClick={() => {
+                                        getWorkout();
+                                    }}
+                                >
+                                    {" "}
+                                    testa ai
+                                </button>
+                            </>
                         ) : (
                             filteredWorkout.map(exercise => (
                                 <div
