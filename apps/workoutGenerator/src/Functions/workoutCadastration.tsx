@@ -3,7 +3,7 @@ import { Formik, Form, Field } from "formik";
 import axios from "axios";
 
 export default function WorkoutCadastration() {
-    const apiUrl = "http://localhost:5000/exercise/";
+    const apiUrl = "http://localhost:8080/exercise/";
 
     function sendWorkout(value: object) {
         axios.post(apiUrl, value);

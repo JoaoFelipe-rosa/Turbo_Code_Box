@@ -2,9 +2,11 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLoading } from "../../../../Functions/hooks/IsLoading";
 import Ringsloader from "../../../../Functions/Loaders/Ringsloader";
+
+import { FaRegTrashAlt } from "react-icons/fa";
 
 enum Sex {
     MALE = "MALE",
@@ -54,41 +56,45 @@ export default function WorkoutCards() {
         return exercicios.filter(exercicio => exercicio.type === tipoDesejado);
     }
 
-    async function getWorkout() {
+    const getWorkout = useCallback(async () => {
         setLoading(true);
-        axios
-            .get(apiUrl)
-            .then(response => {
-                const data = response.data;
-                console.log(data);
-                setWorkout(data);
-                setDaysOfWeek({
-                    Segunda: filtrarPorTipo(Workout, ExerciseType.STRENGTH),
-                    Terça: filtrarPorTipo(Workout, ExerciseType.CARDIO),
-                    Quarta: filtrarPorTipo(Workout, ExerciseType.FLEXIBILITY),
-                    Quinta: filtrarPorTipo(Workout, ExerciseType.BALANCE),
-                });
-            })
-            .catch((err: string) => {
-                err;
-            });
-        setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-    }
+        try {
+            const response = await axios.get(apiUrl);
+            const data = response.data;
 
-    // async function deleteWorkout(id: number) {
-    //   setLoading(true);
-    //   await axios.delete(`${apiUrl}${id}`);
-    //   getWorkout();
-    //   // setTimeout(() => {
-    //   setLoading(false);
-    //   // }, 2000);
-    // }
+            setWorkout(data);
+
+            setDaysOfWeek({
+                Segunda: filtrarPorTipo(data, ExerciseType.STRENGTH),
+                Terça: filtrarPorTipo(data, ExerciseType.CARDIO),
+                Quarta: filtrarPorTipo(data, ExerciseType.FLEXIBILITY),
+                Quinta: filtrarPorTipo(data, ExerciseType.BALANCE),
+            });
+        } catch (err) {
+            console.error("Error fetching workout data:", err);
+        } finally {
+            setLoading(false);
+        }
+    }, [setLoading]);
+
+    const deleteWorkout = useCallback(
+        async (id: number) => {
+            setLoading(true);
+            try {
+                await axios.delete(`${apiUrl}/${id}`);
+                getWorkout();
+            } catch (err) {
+                console.error("Erro ao deletar o exercício:", err);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [setLoading, getWorkout]
+    );
 
     useEffect(() => {
         getWorkout();
-    }, []);
+    }, [getWorkout, selectedDay]);
 
     console.log(daysOfWeek);
     return (
@@ -113,14 +119,6 @@ export default function WorkoutCards() {
                         {!filteredWorkout || filteredWorkout.length === 0 ? (
                             <>
                                 <h1>sem treino</h1>
-                                <button
-                                    onClick={() => {
-                                        getWorkout();
-                                    }}
-                                >
-                                    {" "}
-                                    testa ai
-                                </button>
                             </>
                         ) : (
                             filteredWorkout.map(exercise => (
@@ -164,6 +162,19 @@ export default function WorkoutCards() {
                                                 />
                                             </div>
                                         )}
+                                    </div>
+                                    <div>
+                                        {" "}
+                                        <button
+                                            onClick={() => {
+                                                deleteWorkout(exercise.id);
+                                            }}
+                                            className="flex justify- items-center p-2 bg-[#386180] text-white"
+                                            type="button"
+                                        >
+                                            Deletar exercicio
+                                            <FaRegTrashAlt width={30} />
+                                        </button>
                                     </div>
                                 </div>
                             ))
